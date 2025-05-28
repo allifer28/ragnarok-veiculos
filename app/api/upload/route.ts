@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     const fileExtension = file.name.split(".").pop()
     const fileName = `${uuidv4()}.${fileExtension}`
 
-    const uploadDir = path.join(process.cwd(), "public")
+    const uploadDir = path.join(process.cwd(), "public/uploads")
     const filePath = path.join(uploadDir, fileName)
 
     const arrayBuffer = await file.arrayBuffer()
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
 
     await writeFile(filePath, buffer)
 
-    const fileUrl = `/public/${fileName}`
+    const fileUrl = `/uploads/${fileName}`
 
     return NextResponse.json(
       {
