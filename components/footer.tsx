@@ -26,10 +26,8 @@ export default function Footer() {
               Seu destino para encontrar o veículo dos seus sonhos com as melhores condições do mercado.
             </p>
             <div className="flex space-x-4">
-              <SocialLink href="#" icon={<Facebook className="h-5 w-5" />} />
-              <SocialLink href="#" icon={<Instagram className="h-5 w-5" />} />
-              <SocialLink href="#" icon={<Twitter className="h-5 w-5" />} />
-              <SocialLink href="#" icon={<Youtube className="h-5 w-5" />} />
+              <SocialLink href="https://www.facebook.com/RagnarokVeiculos/" icon={<Facebook className="h-5 w-5" />} />
+              <SocialLink href="https://www.instagram.com/ragnarokveiculos/" icon={<Instagram className="h-5 w-5" />} />
             </div>
           </div>
 

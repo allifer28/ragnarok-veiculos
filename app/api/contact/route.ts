@@ -15,14 +15,24 @@ export async function POST(request: NextRequest) {
 
     const contactData = {
       ...data,
+      destinatario: "ragnarokveiculos@gmail.com", // Email de destino
       createdAt: new Date(),
+      status: "novo", // Para controle de status das mensagens
     }
 
     await db.collection("contacts").insertOne(contactData)
 
+    // Aqui você pode adicionar integração com serviço de email
+    // Por exemplo: SendGrid, Nodemailer, etc.
+    console.log(`Nova mensagem recebida para: ${contactData.destinatario}`)
+    console.log(`De: ${data.nome} (${data.email})`)
+    console.log(`Assunto: ${data.assunto}`)
+    console.log(`Mensagem: ${data.mensagem}`)
+
     return NextResponse.json(
       {
         message: "Mensagem enviada com sucesso",
+        destinatario: "ragnarokveiculos@gmail.com",
       },
       { status: 201 },
     )

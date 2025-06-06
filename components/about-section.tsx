@@ -12,7 +12,7 @@ export default function AboutSection() {
           <div>
             <h2 className="text-3xl font-bold mb-6">Sobre a Ragnarok Veículos</h2>
             <p className="text-lg mb-6">
-              Fundada em 2020, a Ragnarok Veículos nasceu com a missão de revolucionar o mercado automotivo, oferecendo
+              Fundada em 2023, a Ragnarok Veículos nasceu com a missão de revolucionar o mercado automotivo, oferecendo
               veículos de qualidade com transparência e excelência no atendimento.
             </p>
 
@@ -28,14 +28,17 @@ export default function AboutSection() {
             </Button>
           </div>
 
-          <div className="relative h-[400px] rounded-2xl overflow-hidden">
-            <Image
-              src="/vermelho-granada.png?height=800&width=1200"
-              alt="Loja Ragnarok Veículos"
-              fill
-              className="object-cover"
-            />
-          </div>
+          <div
+  className="relative w-full overflow-hidden rounded-2xl"
+  style={{ paddingTop: '66.67%' }}
+>
+  <Image
+    src="/vermelho-granada.png?height=800&width=1200"
+    alt="Loja Ragnarok Veículos"
+    fill
+    className="object-cover"
+  />
+</div>
         </div>
       </div>
     </section>
