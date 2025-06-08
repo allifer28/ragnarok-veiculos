@@ -93,7 +93,7 @@ export default function CarForm({ initialData }: CarFormProps) {
       const formData = new FormData()
       formData.append("file", file)
 
-      const response = await fetch("/api/upload", {
+      const response = await fetch("/api/upload-blob", {
         method: "POST",
         body: formData,
       })
@@ -102,7 +102,7 @@ export default function CarForm({ initialData }: CarFormProps) {
         throw new Error(`Erro ao fazer upload da imagem ${file.name}`)
       }
 
-      const data = await response.json()
+      const data = await response.json()git add
       return data.url
     })
 
