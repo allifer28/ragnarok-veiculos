@@ -102,7 +102,7 @@ export default function CarForm({ initialData }: CarFormProps) {
         throw new Error(`Erro ao fazer upload da imagem ${file.name}`)
       }
 
-      const data = await response.json()git add
+      const data = await response.json()
       return data.url
     })
 
