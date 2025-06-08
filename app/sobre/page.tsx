@@ -9,7 +9,7 @@ export default function SobrePage() {
 
         <div className="relative w-full h-64 md:h-96 rounded-2xl overflow-hidden mb-8">
           <Image
-            src="https://lh3.googleusercontent.com/p/AF1QipOCr2KOQDJKypCLWpW7a-MgoPgmZ9fi4m411jTC=s680-w680-h510-rw"
+            src="/fundoragnarok.jpg?height=80&width=80"
             alt="Equipe Ragnarok Veículos"
             fill
             className="object-cover"
