@@ -10,6 +10,8 @@ const uri = process.env.MONGODB_URI || "mongodb://localhost:27017/ragnarok_veicu
 const options: any = {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+  serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
+  connectTimeoutMS: 10000, // Give up initial connection after 10s
 }
 
 let client: MongoClient
@@ -33,10 +35,22 @@ export async function connectToDatabase() {
   try {
     const client = await clientPromise
     const db = client.db()
+    
+    // Test the connection
+    await db.admin().ping()
+    
     return { client, db }
   } catch (error) {
     console.error("Erro ao conectar ao MongoDB:", error)
-    throw new Error("Não foi possível conectar ao banco de dados")
+    
+    // Provide more helpful error message
+    if (error.message?.includes('ECONNREFUSED')) {
+      console.warn("MongoDB não está disponível. Usando dados de fallback.")
+      // Return null to indicate no database connection
+      return null
+    }
+    
+    throw new Error("Não foi possível conectar ao banco de dados: " + error.message)
   }
 }
 
