@@ -2,6 +2,32 @@ import { type NextRequest, NextResponse } from "next/server"
 import { connectToDatabase } from "@/lib/mongodb"
 import { ObjectId } from "mongodb"
 
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    const { db } = await connectToDatabase()
+    const id = params.id
+
+    if (!ObjectId.isValid(id)) {
+      return NextResponse.json({ error: "ID inválido" }, { status: 400 })
+    }
+
+    const message = await db.collection("contacts").findOne({ _id: new ObjectId(id) })
+
+    if (!message) {
+      return NextResponse.json({ error: "Mensagem não encontrada" }, { status: 404 })
+    }
+
+    // Converter ObjectId para string para serialização
+    return NextResponse.json({
+      ...message,
+      _id: message._id.toString(),
+    })
+  } catch (error) {
+    console.error("Erro ao buscar mensagem:", error)
+    return NextResponse.json({ error: "Erro ao buscar mensagem" }, { status: 500 })
+  }
+}
+
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const { db } = await connectToDatabase()
@@ -17,7 +43,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
     const result = await db
       .collection("contacts")
-      .updateOne({ _id: new ObjectId(id) }, { $set: { read: data.read, updatedAt: new Date() } })
+      .updateOne({ _id: new ObjectId(id) }, { $set: { status: data.status, updatedAt: new Date() } })
 
     if (result.matchedCount === 0) {
       return NextResponse.json({ error: "Mensagem não encontrada" }, { status: 404 })

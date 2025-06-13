@@ -15,29 +15,41 @@ export async function POST(request: NextRequest) {
 
     const contactData = {
       ...data,
-      destinatario: "ragnarokveiculos@gmail.com", // Email de destino
+      status: "novo", // Definir status inicial como "novo"
       createdAt: new Date(),
-      status: "novo", // Para controle de status das mensagens
     }
 
     await db.collection("contacts").insertOne(contactData)
 
-    // Aqui você pode adicionar integração com serviço de email
-    // Por exemplo: SendGrid, Nodemailer, etc.
-    console.log(`Nova mensagem recebida para: ${contactData.destinatario}`)
-    console.log(`De: ${data.nome} (${data.email})`)
-    console.log(`Assunto: ${data.assunto}`)
-    console.log(`Mensagem: ${data.mensagem}`)
-
     return NextResponse.json(
       {
         message: "Mensagem enviada com sucesso",
-        destinatario: "ragnarokveiculos@gmail.com",
       },
       { status: 201 },
     )
   } catch (error) {
     console.error("Erro ao enviar mensagem:", error)
     return NextResponse.json({ error: "Erro ao enviar mensagem" }, { status: 500 })
+  }
+}
+
+// Adicionar o método GET para listar mensagens
+export async function GET(request: NextRequest) {
+  try {
+    const { db } = await connectToDatabase()
+
+    // Buscar todas as mensagens ordenadas por data de criação (mais recentes primeiro)
+    const messages = await db.collection("contacts").find({}).sort({ createdAt: -1 }).toArray()
+
+    // Converter ObjectId para string para serialização
+    const serializedMessages = messages.map((message) => ({
+      ...message,
+      _id: message._id.toString(),
+    }))
+
+    return NextResponse.json(serializedMessages)
+  } catch (error) {
+    console.error("Erro ao buscar mensagens:", error)
+    return NextResponse.json({ error: "Erro ao buscar mensagens" }, { status: 500 })
   }
 }

@@ -62,16 +62,17 @@ export default function MessagesList() {
     }
   }
 
+  // Atualizar a função updateStatus para usar a API correta
   const updateStatus = async (messageId: string, status: string) => {
     try {
       console.log(`Atualizando mensagem ${messageId} para status: ${status}`)
 
-      const response = await fetch("/api/contact", {
+      const response = await fetch(`/api/contact/${messageId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ messageId, status }),
+        body: JSON.stringify({ status }),
       })
 
       if (!response.ok) {
