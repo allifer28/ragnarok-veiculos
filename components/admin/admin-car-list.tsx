@@ -29,9 +29,10 @@ export default function AdminCarList() {
   useEffect(() => {
     async function fetchCars() {
       try {
-        const response = await fetch("/api/cars")
+        const response = await fetch("/api/cars-serverless")
         if (response.ok) {
           const data = await response.json()
+          console.log("Carros carregados:", data.cars)
           setCars(data.cars)
         } else {
           throw new Error("Erro ao buscar veículos")
@@ -60,7 +61,7 @@ export default function AdminCarList() {
     if (!carToDelete) return
 
     try {
-      const response = await fetch(`/api/cars/${carToDelete._id}`, {
+      const response = await fetch(`/api/cars-serverless/${carToDelete._id}`, {
         method: "DELETE",
       })
 
@@ -121,12 +122,18 @@ export default function AdminCarList() {
                 <tr key={car._id} className="hover:bg-muted/50">
                   <td className="px-4 py-3">
                     <div className="flex items-center">
-                      <div className="relative h-12 w-16 mr-3 rounded overflow-hidden">
+                      <div className="relative h-12 w-16 mr-3 rounded overflow-hidden bg-muted">
                         <Image
-                          src={car.imagem || "/placeholder.svg?height=100&width=150"}
+                          src={
+                            car.imagemPrincipal ||
+                            car.imagem ||
+                            car.imagens?.[0] ||
+                            "/placeholder.svg?height=100&width=150"
+                          }
                           alt={car.nome}
                           fill
                           className="object-cover"
+                          unoptimized
                         />
                       </div>
                       <span className="font-medium">{car.nome}</span>
