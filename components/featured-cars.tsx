@@ -1,43 +1,7 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import CarCard from "@/components/car-card"
-
-// Função para buscar carros com fallback
-async function getFeaturedCars() {
-  try {
-    const { getFeaturedCars } = await import("@/lib/data")
-    return await getFeaturedCars()
-  } catch (error) {
-    console.error("Erro ao buscar carros:", error)
-    // Retornar dados mock como fallback
-    return [
-      {
-        _id: "1",
-        nome: "Honda Civic EXL 2023",
-        marca: "Honda",
-        preco: 125000,
-        imagens: ["/placeholder.svg?height=400&width=600"],
-        imagemPrincipal: "/placeholder.svg?height=400&width=600",
-      },
-      {
-        _id: "2",
-        nome: "Toyota Corolla XEI 2022",
-        marca: "Toyota",
-        preco: 115000,
-        imagens: ["/placeholder.svg?height=400&width=600"],
-        imagemPrincipal: "/placeholder.svg?height=400&width=600",
-      },
-      {
-        _id: "3",
-        nome: "Volkswagen Golf TSI 2023",
-        marca: "Volkswagen",
-        preco: 135000,
-        imagens: ["/placeholder.svg?height=400&width=600"],
-        imagemPrincipal: "/placeholder.svg?height=400&width=600",
-      },
-    ]
-  }
-}
+import { getFeaturedCars } from "@/lib/data"
 
 export default async function FeaturedCars() {
   const cars = await getFeaturedCars()

@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { PlusCircle, ArrowLeft, LogOut } from "lucide-react"
+import { PlusCircle, ArrowLeft, LogOut, MessageSquare } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
 export default function AdminHeader() {
@@ -41,7 +41,7 @@ export default function AdminHeader() {
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
         <h1 className="text-3xl font-bold">Painel Administrativo</h1>
-        <p className="text-muted-foreground">Gerencie os veículos da loja</p>
+        <p className="text-muted-foreground">Gerencie os veículos e mensagens da loja</p>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-2">
@@ -49,6 +49,13 @@ export default function AdminHeader() {
           <Link href="/">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Voltar ao Site
+          </Link>
+        </Button>
+
+        <Button asChild variant="outline">
+          <Link href="/admin/messages">
+            <MessageSquare className="mr-2 h-4 w-4" />
+            Mensagens
           </Link>
         </Button>
 

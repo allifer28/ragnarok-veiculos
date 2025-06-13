@@ -9,7 +9,7 @@ export default function SobrePage() {
 
         <div className="relative w-full h-64 md:h-96 rounded-2xl overflow-hidden mb-8">
           <Image
-            src="/placeholder.svg?height=600&width=1200"
+            src="/fundoragnarok.jpg?height=80&width=80"
             alt="Equipe Ragnarok Veículos"
             fill
             className="object-cover"
@@ -18,7 +18,7 @@ export default function SobrePage() {
 
         <div className="prose prose-lg max-w-none">
           <p className="text-lg">
-            Fundada em 2020, a Ragnarok Veículos nasceu com a missão de revolucionar o mercado automotivo, oferecendo
+            Fundada em 2023, a Ragnarok Veículos nasceu com a missão de revolucionar o mercado automotivo, oferecendo
             veículos de qualidade com transparência e excelência no atendimento.
           </p>
 

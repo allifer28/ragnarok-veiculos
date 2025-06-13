@@ -7,15 +7,16 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    domains: ["localhost"],
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "**",
-      },
-    ],
-    unoptimized: true,
-  },
+  domains: ["localhost", "lh3.googleusercontent.com"],
+  remotePatterns: [
+    {
+      protocol: "https",
+      hostname: "**",
+    },
+  ],
+  unoptimized: true,
+},
+
   // Configuração para evitar problemas com módulos nativos no cliente
   webpack: (config, { isServer }) => {
     if (!isServer) {

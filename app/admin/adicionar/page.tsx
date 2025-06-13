@@ -1,5 +1,5 @@
 import AdminHeader from "@/components/admin/admin-header"
-import CarFormProduction from "@/components/admin/car-form-production"
+import CarForm from "@/components/admin/car-form"
 
 export default function AdicionarCarroPage() {
   return (
@@ -8,7 +8,7 @@ export default function AdicionarCarroPage() {
 
       <div className="mt-8">
         <h1 className="text-2xl font-bold mb-6">Adicionar Novo Veículo</h1>
-        <CarFormProduction />
+        <CarForm />
       </div>
     </div>
   )
