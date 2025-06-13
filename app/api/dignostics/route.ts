@@ -9,6 +9,17 @@ export async function GET() {
       mongoUri: !!process.env.MONGODB_URI,
       blobToken: !!process.env.BLOB_READ_WRITE_TOKEN,
       adminPassword: !!process.env.ADMIN_PASSWORD,
+      mongoConnection: false, // Adicionando a propriedade aqui
+    },
+    collections: {
+      cars: {
+        count: 0,
+        status: "pending",
+      },
+      contacts: {
+        count: 0,
+        status: "pending",
+      },
     },
     errors: [] as string[],
   }
@@ -27,20 +38,29 @@ export async function GET() {
     const { db } = await connectToDatabase()
     const result = await db.admin().ping()
     diagnostics.checks.mongoConnection = true
+
+    // Teste 3: Testar coleção cars
+    try {
+      const carsCount = await db.collection("cars").countDocuments()
+      diagnostics.collections.cars.count = carsCount
+      diagnostics.collections.cars.status = "ok"
+    } catch (error) {
+      diagnostics.collections.cars.status = "error"
+      diagnostics.errors.push(`Cars Collection Error: ${error instanceof Error ? error.message : "Unknown error"}`)
+    }
+
+    // Teste 4: Testar coleção contacts
+    try {
+      const contactsCount = await db.collection("contacts").countDocuments()
+      diagnostics.collections.contacts.count = contactsCount
+      diagnostics.collections.contacts.status = "ok"
+    } catch (error) {
+      diagnostics.collections.contacts.status = "error"
+      diagnostics.errors.push(`Contacts Collection Error: ${error instanceof Error ? error.message : "Unknown error"}`)
+    }
   } catch (error) {
     diagnostics.checks.mongoConnection = false
     diagnostics.errors.push(`MongoDB Error: ${error instanceof Error ? error.message : "Unknown error"}`)
-  }
-
-  // Teste 3: Testar busca de carros
-  try {
-    const { db } = await connectToDatabase()
-    const count = await db.collection("cars").countDocuments()
-    diagnostics.checks.carsCollection = true
-    diagnostics.checks.carsCount = count
-  } catch (error) {
-    diagnostics.checks.carsCollection = false
-    diagnostics.errors.push(`Cars Collection Error: ${error instanceof Error ? error.message : "Unknown error"}`)
   }
 
   return NextResponse.json(diagnostics)

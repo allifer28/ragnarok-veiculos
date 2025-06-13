@@ -1,24 +1,13 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { formatDistanceToNow } from "date-fns"
-import { ptBR } from "date-fns/locale"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Trash2, Mail, MailOpen } from "lucide-react"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+import { Button } from "@/components/ui/button"
+import { Mail, Phone, Calendar, User, MessageSquare } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
+// Ajustando a interface para corresponder à sua coleção "contacts"
 interface Message {
   _id: string
   nome: string
@@ -26,32 +15,41 @@ interface Message {
   telefone?: string
   assunto: string
   mensagem: string
-  read: boolean
+  status?: "novo" | "lido" | "respondido" // Pode não existir em mensagens antigas
   createdAt: string
 }
 
-export default function MessageList() {
+export default function MessagesList() {
   const [messages, setMessages] = useState<Message[]>([])
   const [loading, setLoading] = useState(true)
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [messageToDelete, setMessageToDelete] = useState<Message | null>(null)
   const { toast } = useToast()
 
   useEffect(() => {
     fetchMessages()
   }, [])
 
-  async function fetchMessages() {
+  const fetchMessages = async () => {
     try {
       setLoading(true)
-      const response = await fetch("/api/contact")
-      if (response.ok) {
-        const data = await response.json()
-        console.log("Mensagens carregadas:", data)
-        setMessages(data)
-      } else {
-        throw new Error("Erro ao buscar mensagens")
+      console.log("Buscando mensagens...")
+
+      // Adicionar timestamp para evitar cache
+      const response = await fetch(`/api/contact?t=${Date.now()}`)
+
+      if (!response.ok) {
+        throw new Error(`Erro na API: ${response.status} ${response.statusText}`)
       }
+
+      const data = await response.json()
+      console.log("Mensagens recebidas:", data)
+
+      // Garantir que todas as mensagens tenham um status
+      const messagesWithStatus = data.map((msg: any) => ({
+        ...msg,
+        status: msg.status || "novo", // Definir como "novo" se não tiver status
+      }))
+
+      setMessages(messagesWithStatus)
     } catch (error) {
       console.error("Erro ao buscar mensagens:", error)
       toast({
@@ -64,162 +62,165 @@ export default function MessageList() {
     }
   }
 
-  const handleDeleteClick = (message: Message) => {
-    setMessageToDelete(message)
-    setDeleteDialogOpen(true)
-  }
-
-  const handleDeleteConfirm = async () => {
-    if (!messageToDelete) return
-
+  const updateStatus = async (messageId: string, status: string) => {
     try {
-      const response = await fetch(`/api/contact/${messageToDelete._id}`, {
-        method: "DELETE",
-      })
+      console.log(`Atualizando mensagem ${messageId} para status: ${status}`)
 
-      if (response.ok) {
-        setMessages(messages.filter((msg) => msg._id !== messageToDelete._id))
-
-        toast({
-          title: "Sucesso",
-          description: "Mensagem removida com sucesso",
-        })
-      } else {
-        throw new Error("Erro ao excluir mensagem")
-      }
-    } catch (error) {
-      console.error("Erro ao excluir mensagem:", error)
-      toast({
-        title: "Erro",
-        description: "Não foi possível excluir a mensagem",
-        variant: "destructive",
-      })
-    } finally {
-      setDeleteDialogOpen(false)
-      setMessageToDelete(null)
-    }
-  }
-
-  const toggleReadStatus = async (message: Message) => {
-    try {
-      console.log(`Alterando status de leitura para mensagem ${message._id}: ${!message.read}`)
-
-      const response = await fetch(`/api/contact/${message._id}`, {
+      const response = await fetch("/api/contact", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ read: !message.read }),
+        body: JSON.stringify({ messageId, status }),
       })
 
       if (!response.ok) {
-        throw new Error(`Erro na API: ${response.status}`)
+        throw new Error(`Erro na API: ${response.status} ${response.statusText}`)
       }
 
       const data = await response.json()
       console.log("Resposta da API:", data)
 
-      if (data.success) {
-        // Atualizar o estado local
-        setMessages(messages.map((msg) => (msg._id === message._id ? { ...msg, read: !msg.read } : msg)))
+      // Atualizar o estado local
+      setMessages(messages.map((msg) => (msg._id === messageId ? { ...msg, status: status as any } : msg)))
 
-        toast({
-          title: "Sucesso",
-          description: message.read ? "Mensagem marcada como não lida" : "Mensagem marcada como lida",
-        })
-      } else {
-        throw new Error(data.error || "Erro ao atualizar status da mensagem")
-      }
+      toast({
+        title: "Sucesso",
+        description: "Status atualizado com sucesso",
+      })
     } catch (error) {
-      console.error("Erro ao atualizar status da mensagem:", error)
+      console.error("Erro ao atualizar status:", error)
       toast({
         title: "Erro",
-        description: "Não foi possível atualizar o status da mensagem",
+        description: "Não foi possível atualizar o status",
         variant: "destructive",
       })
     }
   }
 
-  if (loading) {
-    return <p>Carregando mensagens...</p>
+  const formatDate = (dateString: string) => {
+    try {
+      return new Date(dateString).toLocaleString("pt-BR")
+    } catch (error) {
+      return "Data inválida"
+    }
   }
 
-  if (messages.length === 0) {
-    return (
-      <div className="text-center py-12 border rounded-lg">
-        <h3 className="text-xl font-medium mb-2">Nenhuma mensagem recebida</h3>
-        <p className="text-muted-foreground">As mensagens enviadas através do formulário de contato aparecerão aqui.</p>
-      </div>
-    )
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "novo":
+        return "bg-red-500"
+      case "lido":
+        return "bg-yellow-500"
+      case "respondido":
+        return "bg-green-500"
+      default:
+        return "bg-gray-500"
+    }
+  }
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case "novo":
+        return "Novo"
+      case "lido":
+        return "Lido"
+      case "respondido":
+        return "Respondido"
+      default:
+        return "Desconhecido"
+    }
+  }
+
+  if (loading) {
+    return <div>Carregando mensagens...</div>
   }
 
   return (
     <div className="space-y-6">
-      {messages.map((message) => (
-        <Card key={message._id} className={message.read ? "bg-card" : "bg-muted/20 border-primary/20"}>
-          <CardContent className="p-6">
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <h3 className="text-lg font-semibold">{message.assunto}</h3>
-                <p className="text-muted-foreground">
-                  De: {message.nome} ({message.email}){message.telefone && ` • Tel: ${message.telefone}`}
-                </p>
-              </div>
-              <Badge variant={message.read ? "outline" : "default"}>{message.read ? "Lida" : "Não lida"}</Badge>
-            </div>
-            <div className="mt-4 bg-muted/30 p-4 rounded-md">
-              <p className="whitespace-pre-wrap">{message.mensagem}</p>
-            </div>
-            <div className="mt-4 text-sm text-muted-foreground">
-              Recebida {formatDistanceToNow(new Date(message.createdAt), { addSuffix: true, locale: ptBR })}
-            </div>
-          </CardContent>
-          <CardFooter className="px-6 py-4 bg-muted/10 flex justify-between">
-            <Button variant="outline" size="sm" onClick={() => toggleReadStatus(message)}>
-              {message.read ? (
-                <>
-                  <Mail className="mr-2 h-4 w-4" />
-                  Marcar como não lida
-                </>
-              ) : (
-                <>
-                  <MailOpen className="mr-2 h-4 w-4" />
-                  Marcar como lida
-                </>
-              )}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="text-destructive hover:text-destructive"
-              onClick={() => handleDeleteClick(message)}
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              Excluir
-            </Button>
-          </CardFooter>
-        </Card>
-      ))}
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold">Mensagens Recebidas</h2>
+        <div className="text-sm text-muted-foreground">
+          Total: <strong>{messages.length} mensagens</strong>
+        </div>
+      </div>
 
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
-            <AlertDialogDescription>
-              Tem certeza que deseja excluir esta mensagem? Esta ação não pode ser desfeita.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDeleteConfirm}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Excluir
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {messages.length === 0 ? (
+        <Card>
+          <CardContent className="p-6 text-center">
+            <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <h3 className="text-lg font-medium mb-2">Nenhuma mensagem</h3>
+            <p className="text-muted-foreground">
+              Quando alguém entrar em contato pelo site, as mensagens aparecerão aqui.
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="space-y-4">
+          {messages.map((message) => (
+            <Card key={message._id} className="overflow-hidden">
+              <CardHeader className="pb-3">
+                <div className="flex items-start justify-between">
+                  <div className="space-y-1">
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <User className="h-4 w-4" />
+                      {message.nome}
+                    </CardTitle>
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <Mail className="h-3 w-3" />
+                        {message.email}
+                      </div>
+                      {message.telefone && (
+                        <div className="flex items-center gap-1">
+                          <Phone className="h-3 w-3" />
+                          {message.telefone}
+                        </div>
+                      )}
+                      <div className="flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        {formatDate(message.createdAt)}
+                      </div>
+                    </div>
+                  </div>
+                  <Badge className={getStatusColor(message.status || "novo")}>
+                    {getStatusText(message.status || "novo")}
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <h4 className="font-medium mb-1">Assunto:</h4>
+                  <p className="text-sm">{message.assunto}</p>
+                </div>
+                <div>
+                  <h4 className="font-medium mb-1">Mensagem:</h4>
+                  <p className="text-sm bg-muted p-3 rounded-md">{message.mensagem}</p>
+                </div>
+                <div className="flex gap-2 pt-2">
+                  {(message.status === "novo" || !message.status) && (
+                    <Button size="sm" variant="outline" onClick={() => updateStatus(message._id, "lido")}>
+                      Marcar como Lido
+                    </Button>
+                  )}
+                  {message.status === "lido" && (
+                    <Button size="sm" variant="outline" onClick={() => updateStatus(message._id, "respondido")}>
+                      Marcar como Respondido
+                    </Button>
+                  )}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => window.open(`mailto:${message.email}?subject=Re: ${message.assunto}`)}
+                  >
+                    Responder por Email
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
