@@ -45,9 +45,7 @@ export async function connectToDatabase() {
     
     // Provide more helpful error message
     if (error.message?.includes('ECONNREFUSED')) {
-      console.warn("MongoDB não está disponível. Usando dados de fallback.")
-      // Return null to indicate no database connection
-      return null
+      throw new Error("MongoDB não está rodando localmente. Verifique se o MongoDB está instalado e rodando, ou configure MONGODB_URI com uma conexão válida do MongoDB Atlas.")
     }
     
     throw new Error("Não foi possível conectar ao banco de dados: " + error.message)

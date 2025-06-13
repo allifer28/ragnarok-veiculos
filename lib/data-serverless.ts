@@ -4,14 +4,7 @@ import type { Car } from "@/lib/types"
 
 export async function getFeaturedCars(): Promise<Car[]> {
   try {
-    const connection = await connectToDatabase()
-    
-    if (!connection) {
-      console.error("Falha ao conectar ao banco de dados")
-      return []
-    }
-    
-    const { db } = connection
+    const { db } = await connectToDatabase()
 
     const cars = await db.collection("cars").find({}).sort({ createdAt: -1 }).limit(6).toArray()
 
@@ -65,22 +58,7 @@ export async function getCars({
   maxPrice?: number
 }) {
   try {
-    const connection = await connectToDatabase()
-    
-    if (!connection) {
-      console.error("Falha ao conectar ao banco de dados")
-      return {
-        cars: [],
-        pagination: {
-          total: 0,
-          page,
-          limit,
-          totalPages: 0,
-        },
-      }
-    }
-    
-    const { db } = connection
+    const { db } = await connectToDatabase()
 
     const filter: any = {}
     if (marca && marca !== "all") filter.marca = marca
@@ -149,14 +127,7 @@ export async function getCars({
 
 export async function getCar(id: string): Promise<Car | null> {
   try {
-    const connection = await connectToDatabase()
-    
-    if (!connection) {
-      console.error("Falha ao conectar ao banco de dados")
-      return null
-    }
-    
-    const { db } = connection
+    const { db } = await connectToDatabase()
 
     if (!ObjectId.isValid(id)) {
       return null
