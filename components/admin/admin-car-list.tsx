@@ -29,7 +29,7 @@ export default function AdminCarList() {
   useEffect(() => {
     async function fetchCars() {
       try {
-        const response = await fetch("/api/cars-serverless")
+        const response = await fetch(`/api/cars-serverless?t=${Date.now()}`)
         if (response.ok) {
           const data = await response.json()
           console.log("Carros carregados:", data.cars)
@@ -127,8 +127,9 @@ export default function AdminCarList() {
                           src={
                             car.imagemPrincipal ||
                             car.imagem ||
-                            car.imagens?.[0] ||
-                            "/placeholder.svg?height=100&width=150"
+                            (car.imagens && car.imagens.length > 0
+                              ? car.imagens[0]
+                              : "/placeholder.svg?height=100&width=150")
                           }
                           alt={car.nome}
                           fill

@@ -99,7 +99,8 @@ export default function CarForm({ initialData }: CarFormProps) {
       })
 
       if (!response.ok) {
-        throw new Error(`Erro ao fazer upload da imagem ${file.name}`)
+        const errorData = await response.json()
+        throw new Error(errorData.error || `Erro ao fazer upload da imagem ${file.name}`)
       }
 
       const data = await response.json()
@@ -185,7 +186,7 @@ export default function CarForm({ initialData }: CarFormProps) {
         imagemPrincipal: imagemPrincipal || images[0], // Fallback para primeira imagem
       }
 
-      const url = initialData ? `/api/cars/${initialData._id}` : "/api/cars"
+      const url = initialData ? `/api/cars-serverless/${initialData._id}` : "/api/cars-serverless"
       const method = initialData ? "PUT" : "POST"
 
       const response = await fetch(url, {

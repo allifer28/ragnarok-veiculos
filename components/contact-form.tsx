@@ -9,9 +9,9 @@ import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Alert, AlertDescription } from "@/components/ui/alert"
 import { useToast } from "@/hooks/use-toast"
-import { Mail } from "lucide-react"
+import { motion } from "framer-motion"
+import { CheckCircle2 } from "lucide-react"
 
 const formSchema = z.object({
   nome: z.string().min(2, {
@@ -31,6 +31,7 @@ const formSchema = z.object({
 
 export default function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
   const { toast } = useToast()
   const router = useRouter()
 
@@ -61,18 +62,17 @@ export default function ContactForm() {
         throw new Error("Erro ao enviar mensagem")
       }
 
-      const result = await response.json()
-
       form.reset()
+      setIsSuccess(true)
 
       toast({
         title: "Mensagem enviada com sucesso!",
-        description: `Sua mensagem foi enviada para ${result.destinatario}. Entraremos em contato em breve.`,
+        description: "Entraremos em contato em breve.",
       })
 
       setTimeout(() => {
-        router.push("/")
-      }, 2000)
+        setIsSuccess(false)
+      }, 5000)
     } catch (error) {
       console.error("Erro ao enviar mensagem:", error)
       toast({
@@ -86,97 +86,120 @@ export default function ContactForm() {
   }
 
   return (
-    <div className="space-y-6">
-      <Alert>
-        <Mail className="h-4 w-4" />
-        <AlertDescription>
-          <strong>Email de contato:</strong> ragnarokveiculos@gmail.com
-          <br />
-          Sua mensagem será enviada diretamente para nossa equipe.
-        </AlertDescription>
-      </Alert>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {isSuccess ? (
+          <motion.div
+            className="bg-primary/10 rounded-lg p-6 text-center"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+              className="mx-auto mb-4 bg-primary/20 rounded-full w-16 h-16 flex items-center justify-center"
+            >
+              <CheckCircle2 className="h-8 w-8 text-primary" />
+            </motion.div>
+            <h3 className="text-xl font-bold mb-2">Mensagem Enviada!</h3>
+            <p className="text-muted-foreground mb-4">
+              Obrigado por entrar em contato. Nossa equipe responderá em breve.
+            </p>
+            <Button onClick={() => form.reset()} variant="outline">
+              Enviar outra mensagem
+            </Button>
+          </motion.div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                control={form.control}
+                name="nome"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nome</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Seu nome completo" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input placeholder="seu.email@exemplo.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                control={form.control}
+                name="telefone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Telefone (opcional)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="(00) 00000-0000" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="assunto"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Assunto</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Assunto da mensagem" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
             <FormField
               control={form.control}
-              name="nome"
+              name="mensagem"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nome</FormLabel>
+                  <FormLabel>Mensagem</FormLabel>
                   <FormControl>
-                    <Input placeholder="Seu nome completo" {...field} />
+                    <Textarea placeholder="Digite sua mensagem aqui..." className="min-h-[120px]" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input placeholder="seu.email@exemplo.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FormField
-              control={form.control}
-              name="telefone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Telefone (opcional)</FormLabel>
-                  <FormControl>
-                    <Input placeholder="(00) 00000-0000" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="assunto"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Assunto</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Assunto da mensagem" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <FormField
-            control={form.control}
-            name="mensagem"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Mensagem</FormLabel>
-                <FormControl>
-                  <Textarea placeholder="Digite sua mensagem aqui..." className="min-h-[120px]" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? "Enviando..." : "Enviar Mensagem"}
-          </Button>
-        </form>
-      </Form>
-    </div>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={isSubmitting}
+              as={motion.button}
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
+            >
+              {isSubmitting ? "Enviando..." : "Enviar Mensagem"}
+            </Button>
+          </>
+        )}
+      </form>
+    </Form>
   )
 }

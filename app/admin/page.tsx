@@ -1,5 +1,5 @@
 import { Suspense } from "react"
-import AdminCarList from "@/components/admin/admin-car-list"
+import AdminCarListProduction from "@/components/admin/admin-car-list-production"
 import AdminHeader from "@/components/admin/admin-header"
 import { Skeleton } from "@/components/ui/skeleton"
 
@@ -10,7 +10,7 @@ export default function AdminPage() {
 
       <div className="mt-8">
         <Suspense fallback={<AdminSkeleton />}>
-          <AdminCarList />
+          <AdminCarListProduction />
         </Suspense>
       </div>
     </div>

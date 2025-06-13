@@ -1,5 +1,5 @@
 import { Suspense } from "react"
-import CarCatalog from "@/components/car-catalog"
+import CarCatalogLocal from "@/components/car-catalog-local"
 import CarFilters from "@/components/car-filters"
 import Footer from "@/components/footer"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -16,7 +16,7 @@ export default function CatalogoPage({
       <CarFilters />
 
       <Suspense fallback={<CatalogSkeleton />}>
-        <CarCatalog
+        <CarCatalogLocal
           page={searchParams.page ? Number(searchParams.page) : 1}
           marca={typeof searchParams.marca === "string" ? searchParams.marca : undefined}
           minPrice={searchParams.minPrice ? Number(searchParams.minPrice) : undefined}

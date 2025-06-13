@@ -80,7 +80,7 @@ export default function AdminLoginPage() {
           <div className="flex justify-center mb-4">
             <div className="relative h-16 w-16">
               <Image
-                src="/logofundopreto.png?height=64&width=64"
+                src="/placeholder.svg?height=64&width=64"
                 alt="Ragnarok Veículos Logo"
                 fill
                 className="object-contain"
