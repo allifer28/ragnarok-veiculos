@@ -89,7 +89,7 @@ export default function Footer() {
             </p>
             <p className="text-gray-500 text-sm">
               Desenvolvido por {" "}
-              <a href="#" className="text-primary hover:underline">
+              <a href="https://enrique-code.netlify.app/" className="text-primary hover:underline">
                 <span className="">Enrique Code &lt;/&gt;</span>
               </a>
             </p>
